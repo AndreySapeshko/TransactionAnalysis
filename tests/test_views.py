@@ -3,7 +3,7 @@ import json
 import pytest
 from freezegun import freeze_time
 
-from src.views import get_start_date, get_data_home_page
+from src.views import get_start_date, get_data_home_page, get_greeting
 
 
 @pytest.mark.parametrize('date, expected', [
@@ -18,3 +18,13 @@ def test_get_start_date(date: str, expected: str) -> None:
 
 def test_get_data_home_page(data_home_page: json) -> None:
     assert get_data_home_page('21.06.2025') == data_home_page
+
+
+@pytest.mark.parametrize('date, expected', [
+    ('YYYY-MM-DD 06:MM:SS', 'Доброе утро'),
+    ('YYYY-MM-DD 12:MM:SS', 'Добрый день'),
+    ('YYYY-MM-DD 22:MM:SS', 'Добрый вечер'),
+    ('YYYY-MM-DD 04:MM:SS', 'Доброй ночи')
+])
+def test_get_greeting(date: str, expected: str) -> None:
+    assert get_greeting(date) == expected

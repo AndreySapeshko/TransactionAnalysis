@@ -87,7 +87,33 @@ def get_start_date() -> datetime:
     return datetime.datetime.strptime(f'01.{todey}', '%d.%m.%Y')
 
 
+def get_greeting(current_date: str) -> str:
+    """ принимает дату в формате YYYY-MM-DD HH:MM:SS
+    и возвращает соответствующее времени суток приветствие """
+
+    hour = int(current_date.split()[1][:2])
+    greeting = 'Доброй ночи'
+    if 5 <= hour < 12:
+        greeting = 'Доброе утро'
+    elif 12 <= hour < 17:
+        greeting = 'Добрый день'
+    elif 17 <= hour < 23:
+        greeting = 'Добрый вечер'
+    return greeting
+
+
 def get_data_home_page(current_date: str) -> json:
+    """ функция принимает на вход строку с датой и временем в формате
+    YYYY-MM-DD HH:MM:SS и возвращающую JSON-ответ со следующими данными:
+    Приветствие в формате
+    — «Доброе утро» / «Добрый день» / «Добрый вечер» / «Доброй ночи» в зависимости от текущего времени.
+    По каждой карте:
+    последние 4 цифры карты;
+    общая сумма расходов;
+    кешбэк (1 рубль на каждые 100 рублей).
+    Топ-5 транзакций по сумме платежа.
+    Курс валют.
+    Стоимость акций из S&P500. """
     result = {}
     result['greeting'] = 'Добрый день'
     result['cards'] = cards
