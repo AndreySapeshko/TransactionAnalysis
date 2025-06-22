@@ -82,9 +82,17 @@ stock_prices = [
 ]
 
 
-def get_start_date() -> datetime:
-    todey = datetime.datetime.today().strftime('%m.%Y')
-    return datetime.datetime.strptime(f'01.{todey}', '%d.%m.%Y')
+def get_start_date(current_date: str) -> datetime:
+    """ принимает дату в формате YYYY-MM-DD HH:MM:SS
+    и возвращает дату начала отбора операций """
+
+    str_start_date = current_date[:8] + '01'
+    return datetime.datetime.strptime(str_start_date, '%Y-%m-%d')
+
+
+def get_cards_expenses(current_date: str) -> list[dict]:
+    pass
+
 
 
 def get_greeting(current_date: str) -> str:
