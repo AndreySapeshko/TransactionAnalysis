@@ -1,9 +1,10 @@
 import json
 
 import pytest
-from freezegun import freeze_time
 
-from src.views import get_start_date, get_data_home_page, get_greeting
+from deepdiff import DeepDiff
+
+from src.views import get_start_date, get_data_home_page, get_greeting, get_cards_expenses
 
 
 @pytest.mark.parametrize('date, expected', [
@@ -27,3 +28,8 @@ def test_get_data_home_page(data_home_page: json) -> None:
 ])
 def test_get_greeting(date: str, expected: str) -> None:
     assert get_greeting(date) == expected
+
+
+def test_get_cards_expenses(expected_cards: list) -> None:
+    diff = DeepDiff(get_cards_expenses('2021-01-23 22:34:55'), expected_cards, ignore_order=True)
+    assert diff == {}

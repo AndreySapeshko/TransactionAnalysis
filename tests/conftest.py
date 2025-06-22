@@ -124,3 +124,19 @@ def data_home_page() -> json:
 @pytest.fixture
 def expected_xlcx() -> list:
     return DATA_FROM_XLCX
+
+
+@pytest.fixture
+def expected_cards() -> list:
+    return [
+    {
+        'last_digits': '*7197',
+        'total_spent': 421.06,
+        'cashback': 0
+    },
+    {
+        'last_digits': '*5091',
+        'total_spent': 571.07,
+        'cashback': 0
+    }
+]

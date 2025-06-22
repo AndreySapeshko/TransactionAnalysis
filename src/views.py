@@ -1,6 +1,9 @@
 import datetime
 import json
 
+from src.utils import read_from_xlcx
+from config import PATH_TEST_XLSX
+
 cards = [
     {
         "last_digits": "5814",
@@ -91,9 +94,32 @@ def get_start_date(current_date: str) -> datetime:
 
 
 def get_cards_expenses(current_date: str) -> list[dict]:
-    pass
+    """ принимает дату в формате YYYY-MM-DD HH:MM:SS и возвращает
+    все расходы  и весь кешбек с начала месяца по каждой карте """
 
+    result = []
+    start_date = get_start_date(current_date)
+    operations = read_from_xlcx(PATH_TEST_XLSX)
+    card_numbers = set([x.get('Номер карты') for x in operations if x.get('Номер карты')])
+    for card_number in card_numbers:
+        total_spent: float = 0
+        cashback: float = 0
+        for operation in operations:
+            if start_date <= datetime.datetime.strptime(operation.get('Дата платежа'),'%d.%m.%Y'):
+                if operation.get('Сумма операции') and operation.get('Номер карты') == card_number:
+                    total_spent += operation.get('Сумма операции')
+                if operation.get('Кэшбэк') and operation.get('Номер карты'):
+                    cashback += operation.get('Кэшбэк')
+        result.append(
+            {
+                'last_digits': card_number,
+                'total_spent': total_spent * -1,
+                'cashback': cashback
+            }
+        )
+    return result
 
+print(get_cards_expenses('2021-01-23 22:34:55'))
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
