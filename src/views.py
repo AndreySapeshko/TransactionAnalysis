@@ -93,13 +93,11 @@ def get_start_date(current_date: str) -> datetime:
     return datetime.datetime.strptime(str_start_date, '%Y-%m-%d')
 
 
-def get_cards_expenses(current_date: str) -> list[dict]:
+def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dict]:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS и возвращает
     все расходы  и весь кешбек с начала месяца по каждой карте """
 
     result = []
-    start_date = get_start_date(current_date)
-    operations = read_from_xlcx(PATH_TEST_XLSX)
     card_numbers = set([x.get('Номер карты') for x in operations if x.get('Номер карты')])
     for card_number in card_numbers:
         total_spent: float = 0
@@ -119,7 +117,14 @@ def get_cards_expenses(current_date: str) -> list[dict]:
         )
     return result
 
-print(get_cards_expenses('2021-01-23 22:34:55'))
+
+def get_top_transactions(current_date: str) -> list[dict]:
+    start_date = get_start_date(current_date)
+    top_transactions = []
+
+    return top_transactions
+
+# print(get_cards_expenses('2021-01-23 22:34:55'))
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
