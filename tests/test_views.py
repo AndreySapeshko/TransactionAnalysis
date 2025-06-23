@@ -5,8 +5,8 @@ import pytest
 
 from deepdiff import DeepDiff
 
-from src.views import get_start_date, get_data_home_page, get_greeting, get_cards_expenses
-from tests.conftest import DATA_FROM_XLCX
+from src.views import get_start_date, get_data_home_page, get_greeting, get_cards_expenses, get_top_transactions
+from tests.conftest import DATA_FROM_XLCX, expected_top
 
 
 @pytest.mark.parametrize('date, expected', [
@@ -36,3 +36,7 @@ def test_get_cards_expenses(expected_cards: list) -> None:
     start_date = datetime.datetime.strptime('2021-01-23 22:34:55', '%Y-%m-%d %H:%M:%S')
     diff = DeepDiff(get_cards_expenses(DATA_FROM_XLCX, start_date), expected_cards, ignore_order=True)
     assert diff == {}
+
+
+def test_get_top_transactions() -> None:
+    assert get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')) == expected_top

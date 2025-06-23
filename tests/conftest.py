@@ -1,6 +1,14 @@
 import pytest
 import json
 
+expected_top = [
+    {'date': '31.12.2021', 'amount': -20000.0, 'category': 'Переводы', 'description': 'Константин Л.'},
+    {'date': '31.12.2021', 'amount': -800.0, 'category': 'Переводы', 'description': 'Константин Л.'},
+    {'date': '31.12.2021', 'amount': -564.0, 'category': 'Различные товары', 'description': 'Ozon.ru'},
+    {'date': '31.12.2021', 'amount': -160.89, 'category': 'Супермаркеты', 'description': 'Колхоз'},
+    {'date': '31.12.2021', 'amount': -118.12, 'category': 'Супермаркеты', 'description': 'Магнит'}
+]
+
 DATA_FROM_XLCX = [
     {'Дата операции': '31.12.2021 16:44:00', 'Дата платежа': '31.12.2021', 'Номер карты': '*7197', 'Статус': 'OK',
      'Сумма операции': -160.89, 'Валюта операции': 'RUB', 'Сумма платежа': -160.89, 'Валюта платежа': 'RUB',
@@ -129,14 +137,14 @@ def expected_xlcx() -> list:
 @pytest.fixture
 def expected_cards() -> list:
     return [
-    {
-        'last_digits': '*7197',
-        'total_spent': 421.06,
-        'cashback': 0
-    },
-    {
-        'last_digits': '*5091',
-        'total_spent': 571.07,
-        'cashback': 0
-    }
-]
+        {
+            'last_digits': '*7197',
+            'total_spent': 421.06,
+            'cashback': 0
+        },
+        {
+            'last_digits': '*5091',
+            'total_spent': 571.07,
+            'cashback': 0
+        }
+    ]

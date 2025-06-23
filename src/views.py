@@ -3,6 +3,7 @@ import json
 
 from src.utils import read_from_xlcx
 from config import PATH_TEST_XLSX
+from tests.conftest import DATA_FROM_XLCX
 
 cards = [
     {
@@ -118,13 +119,25 @@ def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dic
     return result
 
 
-def get_top_transactions(current_date: str) -> list[dict]:
-    start_date = get_start_date(current_date)
+def get_top_transactions(operations: list[dict], start_date: datetime) -> list[dict]:
     top_transactions = []
-
+    operations = [operation for operation in operations if operation.get('Дата операции') and
+                  start_date <= datetime.datetime.strptime(operation.get('Дата операции'), '%d.%m.%Y %H:%M:%S')]
+    sorted_operations = sorted(operations, key=lambda x: x.get('Сумма операции'), reverse=False)
+    for i in range(len(sorted_operations)):
+        if i == 5:
+            break
+        top_transactions.append(
+            {
+                'date': sorted_operations[i].get('Дата платежа'),
+                'amount': sorted_operations[i].get('Сумма операции'),
+                'category': sorted_operations[i].get('Категория'),
+                'description': sorted_operations[i].get('Описание')
+            }
+        )
     return top_transactions
 
-# print(get_cards_expenses('2021-01-23 22:34:55'))
+# print(get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')))
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
