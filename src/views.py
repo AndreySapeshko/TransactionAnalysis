@@ -1,5 +1,6 @@
 import datetime
 import json
+import requests
 
 from src.utils import read_from_xlcx
 from config import PATH_TEST_XLSX
@@ -137,7 +138,20 @@ def get_top_transactions(operations: list[dict], start_date: datetime) -> list[d
         )
     return top_transactions
 
-# print(get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')))
+
+def get_currency_exchange_rates(codes_currencies: list) -> list[dict]:
+    currencies = []
+    rates = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+    for code in codes_currencies:
+        currencies.append(
+            {
+                'currency': code,
+                'rate': rates['Valute'][code]['Value']
+            }
+        )
+    return currencies
+
+# print(get_currency_exchange_rates(['USD', 'EUR']))
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
