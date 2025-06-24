@@ -1,6 +1,8 @@
 import datetime
 import json
 import requests
+import yfinance as yf
+import pandas as pd
 
 from src.utils import read_from_xlcx
 from config import PATH_TEST_XLSX
@@ -146,12 +148,25 @@ def get_currency_exchange_rates(codes_currencies: list) -> list[dict]:
         currencies.append(
             {
                 'currency': code,
-                'rate': rates['Valute'][code]['Value']
+                'rate': round(rates['Valute'][code]['Value'], 2)
             }
         )
     return currencies
 
-# print(get_currency_exchange_rates(['USD', 'EUR']))
+
+def get_stock_prices(tickers: list):
+    stocks = []
+    data = yf.download(tickers, period="1d")
+    data_list = json.loads(data['Close'].to_json(orient="records"))
+    for ticker in tickers:
+        stocks.append(
+            {
+                'stock': ticker,
+                'price': round(data_list[0].get(ticker), 2)
+            }
+        )
+    return stocks
+
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
@@ -180,10 +195,15 @@ def get_data_home_page(current_date: str) -> json:
     Топ-5 транзакций по сумме платежа.
     Курс валют.
     Стоимость акций из S&P500. """
+
+    start_date = get_start_date(current_date)
+    operations = read_from_xlcx(PATH_TEST_XLSX)
     result = {}
-    result['greeting'] = 'Добрый день'
-    result['cards'] = cards
-    result['top_transactions'] = top_transaction
-    result['currency_rates'] = currency_rates
-    result['stock_prices'] = stock_prices
-    return json.dumps(result, indent=4)
+    result['greeting'] = get_greeting(current_date)
+    result['cards'] = get_cards_expenses(operations, start_date)
+    result['top_transactions'] = get_top_transactions(operations, start_date)
+    result['currency_rates'] = get_currency_exchange_rates(['USD', 'EUR'])
+    result['stock_prices'] = get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'])
+    return json.dumps(result, indent=4, ensure_ascii=False)
+
+# print(get_data_home_page('2021-01-23 22:34:55'))

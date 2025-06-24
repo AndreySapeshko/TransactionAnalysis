@@ -1,6 +1,29 @@
 import pytest
 import json
 
+expected_stocks = [
+    {
+      "stock": "AAPL",
+      "price": 201.69
+    },
+    {
+      "stock": "AMZN",
+      "price": 209.77
+    },
+    {
+      "stock": "GOOGL",
+      "price": 165.66
+    },
+    {
+      "stock": "MSFT",
+      "price": 475.93
+    },
+    {
+      "stock": "TSLA",
+      "price": 343.68
+    }
+  ]
+
 expected_top = [
     {'date': '31.12.2021', 'amount': -20000.0, 'category': 'Переводы', 'description': 'Константин Л.'},
     {'date': '31.12.2021', 'amount': -800.0, 'category': 'Переводы', 'description': 'Константин Л.'},
@@ -44,89 +67,90 @@ DATA_FROM_XLCX = [
      'Округление на инвесткопилку': 0, 'Сумма операции с округлением': 7.07}]
 
 home_page_data = {
-    "greeting": "Добрый день",
+    "greeting": "Добрый вечер",
     "cards": [
         {
-            "last_digits": "5814",
-            "total_spent": 1262.00,
-            "cashback": 12.62
+            "last_digits": "*7197",
+            "total_spent": 421.06,
+            "cashback": 0
         },
         {
-            "last_digits": "7512",
-            "total_spent": 7.94,
-            "cashback": 0.08
+            "last_digits": "*5091",
+            "total_spent": 571.07,
+            "cashback": 0
         }
     ],
     "top_transactions": [
         {
-            "date": "21.12.2021",
-            "amount": 1198.23,
+            "date": "31.12.2021",
+            "amount": -20000.0,
             "category": "Переводы",
-            "description": "Перевод Кредитная карта. ТП 10.2 RUR"
+            "description": "Константин Л."
         },
         {
-            "date": "20.12.2021",
-            "amount": 829.00,
-            "category": "Супермаркеты",
-            "description": "Лента"
+            "date": "31.12.2021",
+            "amount": -800.0,
+            "category": "Переводы",
+            "description": "Константин Л."
         },
         {
-            "date": "20.12.2021",
-            "amount": 421.00,
+            "date": "31.12.2021",
+            "amount": -564.0,
             "category": "Различные товары",
             "description": "Ozon.ru"
         },
         {
-            "date": "16.12.2021",
-            "amount": -14216.42,
-            "category": "ЖКХ",
-            "description": "ЖКУ Квартира"
+            "date": "31.12.2021",
+            "amount": -160.89,
+            "category": "Супермаркеты",
+            "description": "Колхоз"
         },
         {
-            "date": "16.12.2021",
-            "amount": 453.00,
-            "category": "Бонусы",
-            "description": "Кешбэк за обычные покупки"
+            "date": "31.12.2021",
+            "amount": -118.12,
+            "category": "Супермаркеты",
+            "description": "Магнит"
         }
     ],
     "currency_rates": [
         {
             "currency": "USD",
-            "rate": 73.21
+            "rate": 78.29
         },
         {
             "currency": "EUR",
-            "rate": 87.08
+            "rate": 89.84
         }
     ],
     "stock_prices": [
         {
             "stock": "AAPL",
-            "price": 150.12
+            "price": 201.5
         },
         {
             "stock": "AMZN",
-            "price": 3173.18
+            "price": 208.47
         },
         {
             "stock": "GOOGL",
-            "price": 2742.39
+            "price": 165.19
         },
         {
             "stock": "MSFT",
-            "price": 296.71
+            "price": 486.0
         },
         {
             "stock": "TSLA",
-            "price": 1007.08
+            "price": 348.68
         }
     ]
 }
 
 
+
 @pytest.fixture
 def data_home_page() -> json:
-    return json.dumps(home_page_data, indent=4)
+    return json.dumps(home_page_data, indent=4, ensure_ascii=False)
 
 
 @pytest.fixture
