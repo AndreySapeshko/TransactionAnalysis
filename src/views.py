@@ -1,117 +1,56 @@
 import datetime
 import json
-import requests
-import yfinance as yf
-import pandas as pd
+import logging
 
-from src.utils import read_from_xlcx
-from config import PATH_TEST_XLSX
-from tests.conftest import DATA_FROM_XLCX
-
-cards = [
-    {
-        "last_digits": "5814",
-        "total_spent": 1262.00,
-        "cashback": 12.62
-    },
-    {
-        "last_digits": "7512",
-        "total_spent": 7.94,
-        "cashback": 0.08
-    }
-]
-
-top_transaction = [
-    {
-        "date": "21.12.2021",
-        "amount": 1198.23,
-        "category": "Переводы",
-        "description": "Перевод Кредитная карта. ТП 10.2 RUR"
-    },
-    {
-        "date": "20.12.2021",
-        "amount": 829.00,
-        "category": "Супермаркеты",
-        "description": "Лента"
-    },
-    {
-        "date": "20.12.2021",
-        "amount": 421.00,
-        "category": "Различные товары",
-        "description": "Ozon.ru"
-    },
-    {
-        "date": "16.12.2021",
-        "amount": -14216.42,
-        "category": "ЖКХ",
-        "description": "ЖКУ Квартира"
-    },
-    {
-        "date": "16.12.2021",
-        "amount": 453.00,
-        "category": "Бонусы",
-        "description": "Кешбэк за обычные покупки"
-    }
-]
-
-currency_rates = [
-    {
-        "currency": "USD",
-        "rate": 73.21
-    },
-    {
-        "currency": "EUR",
-        "rate": 87.08
-    }
-]
-
-stock_prices = [
-    {
-        "stock": "AAPL",
-        "price": 150.12
-    },
-    {
-        "stock": "AMZN",
-        "price": 3173.18
-    },
-    {
-        "stock": "GOOGL",
-        "price": 2742.39
-    },
-    {
-        "stock": "MSFT",
-        "price": 296.71
-    },
-    {
-        "stock": "TSLA",
-        "price": 1007.08
-    }
-]
+from src.utils import read_from_xlcx, get_currency_exchange_rates, get_stock_prices, read_from_json
+from config import PATH_TEST_XLSX, PATH_VIEWS_LOG, PATH_USER_SETTINGS
 
 
-def get_start_date(current_date: str) -> datetime:
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+file_handler = logging.FileHandler(PATH_VIEWS_LOG, 'w', encoding='utf-8')
+file_formater = logging.Formatter('%(asctime)s-%(name)s %(levelname)s: %(message)s')
+file_handler.setFormatter(file_formater)
+logger.addHandler(file_handler)
+
+
+def get_start_date(current_date: str) -> datetime.datetime:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
     и возвращает дату начала отбора операций """
 
-    str_start_date = current_date[:8] + '01'
-    return datetime.datetime.strptime(str_start_date, '%Y-%m-%d')
+    logger.info('Запущена функция get_start_date')
+    try:
+        str_start_date = current_date[:8] + '01'
+        start_date = datetime.datetime.strptime(str_start_date, '%Y-%m-%d')
+    except Exception as e:
+        logger.error(f'Произошла ошибка при обработке даты: {e}')
+        print(f'Произошла ошибка при обработке даты: {e}')
+    logger.info('Функция get_start_date завершена успешно')
+    return start_date
+
+print(get_start_date('2021-01-23 22:34:55'))
 
 
 def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dict]:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS и возвращает
     все расходы  и весь кешбек с начала месяца по каждой карте """
 
+    logger.info('Запущена функция get_cards_expenses')
     result = []
     card_numbers = set([x.get('Номер карты') for x in operations if x.get('Номер карты')])
-    for card_number in card_numbers:
+    for card_number in sorted(card_numbers):
+        logger.info(f'Обрабатываем счет: {card_number}')
         total_spent: float = 0
         cashback: float = 0
         for operation in operations:
-            if start_date <= datetime.datetime.strptime(operation.get('Дата платежа'),'%d.%m.%Y'):
-                if operation.get('Сумма операции') and operation.get('Номер карты') == card_number:
-                    total_spent += operation.get('Сумма операции')
-                if operation.get('Кэшбэк') and operation.get('Номер карты'):
-                    cashback += operation.get('Кэшбэк')
+            try:
+                if start_date <= datetime.datetime.strptime(operation.get('Дата платежа'), '%d.%m.%Y'):
+                    if operation.get('Сумма операции') and operation.get('Номер карты') == card_number:
+                        total_spent += operation.get('Сумма операции')
+                    if operation.get('Кэшбэк') and operation.get('Номер карты'):
+                        cashback += operation.get('Кэшбэк')
+            except Exception as e:
+                print(f'Ошибка обработки "даты платежи" или "Сумма операции" или "Кэшбэк": {e}')
         result.append(
             {
                 'last_digits': card_number,
@@ -119,14 +58,30 @@ def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dic
                 'cashback': cashback
             }
         )
+        logger.info(f'Счет {card_number} успешно обработан')
+    logger.info('Функция get_cards_expenses успешно завершена')
     return result
 
 
 def get_top_transactions(operations: list[dict], start_date: datetime) -> list[dict]:
+    """ Выбираем из списка транзакций пять самых крупных с начала месяца
+    в переданной дате, возвращаем в виде списка словарей """
+
+    logger.info('Запущена функция get_top_transactions')
     top_transactions = []
-    operations = [operation for operation in operations if operation.get('Дата операции') and
-                  start_date <= datetime.datetime.strptime(operation.get('Дата операции'), '%d.%m.%Y %H:%M:%S')]
-    sorted_operations = sorted(operations, key=lambda x: x.get('Сумма операции'), reverse=False)
+    filtered_operations = []
+    logger.info('Отфильтровываем операции по дате')
+    for operation in operations:
+        try:
+            date_operation = datetime.datetime.strptime(operation.get('Дата операции'), '%d.%m.%Y %H:%M:%S')
+            if operation.get('Дата операции') and start_date <= date_operation:
+                filtered_operations.append(operation)
+        except Exception as e:
+            logger.error(f'Ошибка обработки "Дата операции": {e}')
+            print(f'Ошибка обработки "Дата операции": {e}')
+            continue
+    logger.info('Сортеруем операции по сумме')
+    sorted_operations = sorted(filtered_operations, key=lambda x: x.get('Сумма операции'), reverse=False)
     for i in range(len(sorted_operations)):
         if i == 5:
             break
@@ -138,41 +93,21 @@ def get_top_transactions(operations: list[dict], start_date: datetime) -> list[d
                 'description': sorted_operations[i].get('Описание')
             }
         )
+    logger.info('Функция get_top_transactions успешно завершена')
     return top_transactions
-
-
-def get_currency_exchange_rates(codes_currencies: list) -> list[dict]:
-    currencies = []
-    rates = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
-    for code in codes_currencies:
-        currencies.append(
-            {
-                'currency': code,
-                'rate': round(rates['Valute'][code]['Value'], 2)
-            }
-        )
-    return currencies
-
-
-def get_stock_prices(tickers: list):
-    stocks = []
-    data = yf.download(tickers, period="1d")
-    data_list = json.loads(data['Close'].to_json(orient="records"))
-    for ticker in tickers:
-        stocks.append(
-            {
-                'stock': ticker,
-                'price': round(data_list[0].get(ticker), 2)
-            }
-        )
-    return stocks
 
 
 def get_greeting(current_date: str) -> str:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS
     и возвращает соответствующее времени суток приветствие """
 
-    hour = int(current_date.split()[1][:2])
+    logger.info('Запущена функция get_greeting')
+    try:
+        hour = int(current_date.split()[1][:2])
+    except Exception as e:
+        logger.error(f'Не верный формат даты: {e}')
+        print(f'Не верный формат даты: {e}')
+        return 'Добрый день'
     greeting = 'Доброй ночи'
     if 5 <= hour < 12:
         greeting = 'Доброе утро'
@@ -180,10 +115,11 @@ def get_greeting(current_date: str) -> str:
         greeting = 'Добрый день'
     elif 17 <= hour < 23:
         greeting = 'Добрый вечер'
+    logger.info('Функция get_greeting успешно завершена')
     return greeting
 
 
-def get_data_home_page(current_date: str) -> json:
+def get_data_home_page(current_date: str, file_user_settings: str) -> str:
     """ функция принимает на вход строку с датой и временем в формате
     YYYY-MM-DD HH:MM:SS и возвращающую JSON-ответ со следующими данными:
     Приветствие в формате
@@ -196,14 +132,17 @@ def get_data_home_page(current_date: str) -> json:
     Курс валют.
     Стоимость акций из S&P500. """
 
+    user_settings = read_from_json(file_user_settings)
+    user_currencies = user_settings[0].get('user_currencies')
+    user_stocks = user_settings[0].get('user_stocks')
     start_date = get_start_date(current_date)
     operations = read_from_xlcx(PATH_TEST_XLSX)
     result = {}
     result['greeting'] = get_greeting(current_date)
     result['cards'] = get_cards_expenses(operations, start_date)
     result['top_transactions'] = get_top_transactions(operations, start_date)
-    result['currency_rates'] = get_currency_exchange_rates(['USD', 'EUR'])
-    result['stock_prices'] = get_stock_prices(['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA'])
+    result['currency_rates'] = get_currency_exchange_rates(user_currencies)
+    result['stock_prices'] = get_stock_prices(user_stocks)
     return json.dumps(result, indent=4, ensure_ascii=False)
 
-# print(get_data_home_page('2021-01-23 22:34:55'))
+print(get_data_home_page('2021-01-23 22:34:55', PATH_USER_SETTINGS))

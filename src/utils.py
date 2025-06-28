@@ -69,7 +69,7 @@ def get_currency_exchange_rates(codes_currencies: list) -> list[dict]:
             logger.error(f'Ошибка обработки валюты {code}: {e}')
             print(f'Ошибка обработки валюты {code}: {e}')
             currencies.append({'currency': code, 'rate': None})
-    logger.info('Функция успешно завершила работу')
+    logger.info('Функция get_currency_exchange_rates успешно завершила работу')
     return currencies
 
 
@@ -98,6 +98,7 @@ def get_stock_prices(tickers: list) -> None:
                 stocks.append({'stock': ticker, 'price': None})
         else:
             stocks.append({'stock': ticker, 'price': None})
+    logger.info('Функция get_stock_prices успешно завершила работу')
     return stocks
 
 
