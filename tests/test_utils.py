@@ -6,9 +6,9 @@ from unittest.mock import patch
 from deepdiff import DeepDiff
 from unittest.mock import Mock
 
-from src.utils import read_from_xlcx, get_currency_exchange_rates, get_stock_prices
+from src.utils import read_from_xlcx, get_currency_exchange_rates, get_stock_prices, read_from_json
 from tests.conftest import DATA_FROM_XLCX, expected_stocks
-from config import PATH_TEST_XLSX, PATH_FILE_NOT_FOUND
+from config import PATH_TEST_XLSX, PATH_FILE_NOT_FOUND, PATH_USER_SETTINGS
 
 
 @pytest.mark.parametrize('path_name, expected', [
@@ -65,3 +65,7 @@ def test_get_stock_prices(mock_download: Mock):
     result = get_stock_prices(tickers)
 
     assert DeepDiff(result, expected_stocks, ignore_order=True) == {}
+
+
+def test_read_from_json(expected_json) -> None:
+    assert read_from_json(PATH_USER_SETTINGS) == expected_json

@@ -158,6 +158,11 @@ def expected_xlcx() -> list:
 
 
 @pytest.fixture
+def expected_json() -> list:
+    return [{"user_currencies": ["USD", "EUR"], "user_stocks": ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]}]
+
+
+@pytest.fixture
 def expected_cards() -> list:
     return [
         {

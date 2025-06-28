@@ -99,3 +99,25 @@ def get_stock_prices(tickers: list) -> None:
         else:
             stocks.append({'stock': ticker, 'price': None})
     return stocks
+
+
+def read_from_json(filename: str) -> list[dict]:
+    """ конвертирует json файл в python, если файла нет или пустой вернет пустой список """
+
+    json_data: list[dict] = []
+    logger.info(f'проверяем существует ли файл {filename}')
+    if os.path.exists(filename):
+        try:
+            logger.info('открываем файл для чтения')
+            with open(filename, 'r', encoding='utf-8') as file:
+                data = json.load(file)
+        except json.JSONDecodeError as jde:
+            logger.error(f'произошла ошибка при открытии файла {jde}')
+            return json_data
+        except FileNotFoundError as fnf:
+            logger.error(f'произошла ошибка при открытии файла {fnf}')
+            return json_data
+        if type(data) is dict and len(data) != 0:
+            json_data = [data]
+        logger.info('конвертация успешно завершена')
+    return json_data

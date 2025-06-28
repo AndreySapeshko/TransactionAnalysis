@@ -5,3 +5,4 @@ PATH_FILE_NOT_FOUND = Path(__file__).parent.parent / 'data' / 'reader_excel.xlsx
 PATH_OPERATIONS = Path(__file__).parent / 'data' / 'operations.xlsx'
 PATH_UTILS_LOG = Path(__file__).parent / 'logs' / 'utils.log'
 PATH_VIEWS_LOG = Path(__file__).parent / 'logs' / 'views.log'
+PATH_USER_SETTINGS = Path(__file__).parent / 'user_settings.json'
