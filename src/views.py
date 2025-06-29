@@ -28,10 +28,8 @@ def get_start_date(current_date: str) -> datetime.datetime:
     logger.info('Функция get_start_date завершена успешно')
     return start_date
 
-print(get_start_date('2021-01-23 22:34:55'))
 
-
-def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dict]:
+def get_cards_expenses(operations: list[dict], start_date: datetime.datetime) -> list[dict]:
     """ принимает дату в формате YYYY-MM-DD HH:MM:SS и возвращает
     все расходы  и весь кешбек с начала месяца по каждой карте """
 
@@ -63,7 +61,7 @@ def get_cards_expenses(operations: list[dict], start_date: datetime) -> list[dic
     return result
 
 
-def get_top_transactions(operations: list[dict], start_date: datetime) -> list[dict]:
+def get_top_transactions(operations: list[dict], start_date: datetime.datetime) -> list[dict]:
     """ Выбираем из списка транзакций пять самых крупных с начала месяца
     в переданной дате, возвращаем в виде списка словарей """
 
@@ -74,7 +72,7 @@ def get_top_transactions(operations: list[dict], start_date: datetime) -> list[d
     for operation in operations:
         try:
             date_operation = datetime.datetime.strptime(operation.get('Дата операции'), '%d.%m.%Y %H:%M:%S')
-            if operation.get('Дата операции') and start_date <= date_operation:
+            if operation.get('Дата операции') and operation.get('Сумма операции') and start_date <= date_operation:
                 filtered_operations.append(operation)
         except Exception as e:
             logger.error(f'Ошибка обработки "Дата операции": {e}')

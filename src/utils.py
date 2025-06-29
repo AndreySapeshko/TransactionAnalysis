@@ -73,7 +73,7 @@ def get_currency_exchange_rates(codes_currencies: list) -> list[dict]:
     return currencies
 
 
-def get_stock_prices(tickers: list) -> None:
+def get_stock_prices(tickers: list) -> list:
     """ получаем курсы акций по тикерам из переданнгог списка по API с
     Yahoo financevи возвращаем данные в виде списка словарей """
 

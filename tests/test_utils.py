@@ -49,7 +49,7 @@ def test_get_currency_exchange_rates() -> None:
 
 
 @patch('yfinance.download')
-def test_get_stock_prices(mock_download: Mock):
+def test_get_stock_prices(mock_download: Mock) -> None:
     mock_df = pd.DataFrame({
         'Close': [{
             'AAPL': 201.69,
@@ -67,5 +67,5 @@ def test_get_stock_prices(mock_download: Mock):
     assert DeepDiff(result, expected_stocks, ignore_order=True) == {}
 
 
-def test_read_from_json(expected_json) -> None:
+def test_read_from_json(expected_json: list) -> None:
     assert read_from_json(PATH_USER_SETTINGS) == expected_json

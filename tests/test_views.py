@@ -7,7 +7,6 @@ from unittest.mock import Mock
 
 from src.views import get_start_date, get_data_home_page, get_greeting, get_cards_expenses, get_top_transactions
 from tests.conftest import DATA_FROM_XLCX, expected_top
-from config import PATH_USER_SETTINGS
 
 
 @pytest.mark.parametrize('date, expected', [
@@ -53,4 +52,4 @@ def test_get_cards_expenses(expected_cards: list) -> None:
 
 
 def test_get_top_transactions() -> None:
-       assert get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')) == expected_top
+    assert get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')) == expected_top
