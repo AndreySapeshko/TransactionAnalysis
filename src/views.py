@@ -3,13 +3,13 @@ import json
 import logging
 
 from src.utils import read_from_xlcx, get_currency_exchange_rates, get_stock_prices, read_from_json
-from config import PATH_TEST_XLSX, PATH_VIEWS_LOG, PATH_USER_SETTINGS
+from config import PATH_TEST_XLSX, PATH_VIEWS_LOG, PATH_USER_SETTINGS, ERROR_STUB
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler(PATH_VIEWS_LOG, 'w', encoding='utf-8')
-file_formater = logging.Formatter('%(asctime)s-%(name)s %(levelname)s: %(message)s')
+file_formater = logging.Formatter('%(asctime)s-%(name)s %(funcName)s %(levelname)s: %(message)s')
 file_handler.setFormatter(file_formater)
 logger.addHandler(file_handler)
 
@@ -119,7 +119,7 @@ def get_greeting(current_date: str) -> str:
     return greeting
 
 
-def get_data_home_page(current_date: str, file_user_settings: str) -> str:
+def get_data_home_page(current_date: str) -> str:
     """ функция принимает на вход строку с датой и временем в формате
     YYYY-MM-DD HH:MM:SS и возвращающую JSON-ответ со следующими данными:
     Приветствие в формате
@@ -132,17 +132,31 @@ def get_data_home_page(current_date: str, file_user_settings: str) -> str:
     Курс валют.
     Стоимость акций из S&P500. """
 
-    user_settings = read_from_json(file_user_settings)
-    user_currencies = user_settings[0].get('user_currencies')
-    user_stocks = user_settings[0].get('user_stocks')
+    logger.info('Запущена функция get_data_home_page')
+    logger.info('Получаем данные из operations и user_settings')
+    user_settings = read_from_json(PATH_USER_SETTINGS)
+    try:
+        user_currencies = user_settings[0].get('user_currencies')
+        user_stocks = user_settings[0].get('user_stocks')
+    except Exception as e:
+        logger.error(f'Ошибка при обработке user_settings: {e}')
+        print(f'Ошибка при обработке user_settings: {e}')
+        user_currencies = ['USD', 'EUR']
+        user_stocks = ['AAPL', 'AMZN', 'GOOGL', 'MSFT', 'TSLA']
     start_date = get_start_date(current_date)
     operations = read_from_xlcx(PATH_TEST_XLSX)
     result = {}
+    logger.info('Формируем ответ')
     result['greeting'] = get_greeting(current_date)
     result['cards'] = get_cards_expenses(operations, start_date)
     result['top_transactions'] = get_top_transactions(operations, start_date)
     result['currency_rates'] = get_currency_exchange_rates(user_currencies)
     result['stock_prices'] = get_stock_prices(user_stocks)
-    return json.dumps(result, indent=4, ensure_ascii=False)
-
-print(get_data_home_page('2021-01-23 22:34:55', PATH_USER_SETTINGS))
+    try:
+        result_json = json.dumps(result, indent=4, ensure_ascii=False)
+    except Exception as e:
+        logger.error(f'Ошибка при конвертации в json: {e}')
+        print(f'Ошибка при конвертации в json: {e}')
+        result_json = ERROR_STUB
+    logger.info('Функция get_data_home_page успешно завершена')
+    return result_json

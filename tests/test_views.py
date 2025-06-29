@@ -33,7 +33,7 @@ def test_get_data_home_page(mock_rates: Mock, mock_stock: Mock, data_home_page: 
         {"stock": "MSFT", "price": 491.85},
         {"stock": "TSLA", "price": 326.63}
     ]
-    assert get_data_home_page('2021-01-23 22:34:55', PATH_USER_SETTINGS) == data_home_page
+    assert get_data_home_page('2021-01-23 22:34:55') == data_home_page
 
 
 @pytest.mark.parametrize('date, expected', [

@@ -12,7 +12,7 @@ from config import PATH_UTILS_LOG
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 file_handler = logging.FileHandler(PATH_UTILS_LOG, 'w', encoding='utf-8')
-file_formater = logging.Formatter('%(asctime)s-%(name)s %(levelname)s: %(message)s')
+file_formater = logging.Formatter('%(asctime)s-%(name)s %(funcName)s %(levelname)s: %(message)s')
 file_handler.setFormatter(file_formater)
 logger.addHandler(file_handler)
 
@@ -105,6 +105,7 @@ def get_stock_prices(tickers: list) -> None:
 def read_from_json(filename: str) -> list[dict]:
     """ конвертирует json файл в python, если файла нет или пустой вернет пустой список """
 
+    logger.info('Запущена функция read_from_json')
     json_data: list[dict] = []
     logger.info(f'проверяем существует ли файл {filename}')
     if os.path.exists(filename):
