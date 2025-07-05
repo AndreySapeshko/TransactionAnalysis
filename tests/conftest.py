@@ -150,6 +150,8 @@ expected_json = [
         {"user_currencies": ["USD", "EUR"], "user_stocks": ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]}
     ]
 
+expected_cashback = {'Каршеринг': 0.07, 'Переводы': 208.0, 'Различные товары': 5.64, 'Супермаркеты': 4.21}
+
 
 @pytest.fixture
 def data_home_page() -> str:
