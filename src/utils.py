@@ -84,7 +84,9 @@ def get_stock_prices(tickers: list) -> list:
         data_list = json.loads(data['Close'].to_json(orient="records"))
         logger.info('Данные по запросу получены')
     except Exception as e:
+        logger.error(f'Ошибка при получении запраса: {e}')
         print(f'Ошибка при получении запраса: {e}')
+        return [{'stock': ticker, 'price': None} for ticker in tickers]
     if not data_list or len(data_list) == 0:
         logger.info('Список пустой или None')
         return [{'stock': ticker, 'price': None} for ticker in tickers]

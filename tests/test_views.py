@@ -53,3 +53,9 @@ def test_get_cards_expenses(expected_cards: list) -> None:
 
 def test_get_top_transactions() -> None:
     assert get_top_transactions(DATA_FROM_XLCX, get_start_date('2021-01-23 22:34:55')) == expected_top
+
+
+def test_get_top_transactions_error() -> None:
+    result = get_top_transactions(DATA_FROM_XLCX, None)
+    assert result == []
+

@@ -146,6 +146,10 @@ home_page_data = {
     ]
 }
 
+expected_json = [
+        {"user_currencies": ["USD", "EUR"], "user_stocks": ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]}
+    ]
+
 
 @pytest.fixture
 def data_home_page() -> str:
@@ -157,9 +161,9 @@ def expected_xlcx() -> list:
     return DATA_FROM_XLCX
 
 
-@pytest.fixture
-def expected_json() -> list:
-    return [{"user_currencies": ["USD", "EUR"], "user_stocks": ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]}]
+# @pytest.fixture
+# def expected_json() -> list:
+#     return [{"user_currencies": ["USD", "EUR"], "user_stocks": ["AAPL", "AMZN", "GOOGL", "MSFT", "TSLA"]}]
 
 
 @pytest.fixture

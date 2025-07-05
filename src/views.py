@@ -48,6 +48,7 @@ def get_cards_expenses(operations: list[dict], start_date: datetime.datetime) ->
                     if operation.get('Кэшбэк') and operation.get('Номер карты'):
                         cashback += operation.get('Кэшбэк')
             except Exception as e:
+                logger.error(f'Ошибка обработки "даты платежи" или "Сумма операции" или "Кэшбэк": {e}')
                 print(f'Ошибка обработки "даты платежи" или "Сумма операции" или "Кэшбэк": {e}')
         result.append(
             {
