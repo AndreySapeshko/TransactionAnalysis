@@ -10,7 +10,11 @@ def spending_by_category(transactions: pd.DataFrame,
                          category: str,
                          date: Optional[str] = None) -> pd.DataFrame:
     if date:
-        end_date = datetime.datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
+        try:
+            end_date = datetime.datetime.strptime(date, '%d.%m.%Y %H:%M:%S')
+        except Exception as e:
+            print(f'Ошибка при обработке даты: {e}')
+            end_date = datetime.datetime.now()
     else:
         end_date = datetime.datetime.now()
     start_date = end_date + relativedelta(months=-3)
@@ -20,9 +24,5 @@ def spending_by_category(transactions: pd.DataFrame,
     filtered_transactions = transactions.loc[
         (transactions['Дата операции'] >= start_date) & (transactions['Дата операции'] < end_date)
         ]
-    result = filtered_transactions.groupby('Категория')['Сумма операции'].sum()
+    result = filtered_transactions.groupby(category)['Сумма операции'].sum()
     return result
-
-
-df_operations = pd.read_excel(PATH_TEST_XLSX)
-print(spending_by_category(df_operations, '', '31.12.2021 01:23:42'))
