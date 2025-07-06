@@ -6,6 +6,7 @@ PATH_OPERATIONS = Path(__file__).parent / 'data' / 'operations.xlsx'
 PATH_UTILS_LOG = Path(__file__).parent / 'logs' / 'utils.log'
 PATH_VIEWS_LOG = Path(__file__).parent / 'logs' / 'views.log'
 PATH_USER_SETTINGS = Path(__file__).parent / 'user_settings.json'
+PATH_SERVICES_LOG = Path(__file__).parent / 'logs' / 'services.log'
 ERROR_STUB = {
     "greeting": "Добрый вечер",
     "cards": [
