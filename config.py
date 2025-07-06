@@ -7,6 +7,7 @@ PATH_UTILS_LOG = Path(__file__).parent / 'logs' / 'utils.log'
 PATH_VIEWS_LOG = Path(__file__).parent / 'logs' / 'views.log'
 PATH_USER_SETTINGS = Path(__file__).parent / 'user_settings.json'
 PATH_SERVICES_LOG = Path(__file__).parent / 'logs' / 'services.log'
+PATH_REPORTS_LOG = Path(__file__).parent / 'logs' / 'reports.log'
 ERROR_STUB = {
     "greeting": "Добрый вечер",
     "cards": [
