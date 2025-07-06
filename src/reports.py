@@ -57,8 +57,3 @@ def spending_by_category(transactions: pd.DataFrame,
     logger.info('Работа функции spending_by_category завершена успешно')
     print(result.to_json(force_ascii=False))
     return result
-
-df_trans = pd.read_excel(PATH_TEST_XLSX)
-
-res = spending_by_category(df_trans, 'Категория', '31.12.2021 15:23:42')
-print(res)
