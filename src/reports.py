@@ -1,6 +1,7 @@
+from functools import wraps
 from typing import Optional
 from dateutil.relativedelta import relativedelta
-from config import PATH_REPORTS_LOG
+from config import PATH_REPORTS_LOG, PATH_TEST_XLSX
 
 import pandas as pd
 import datetime
@@ -15,6 +16,19 @@ file_handler.setFormatter(file_formater)
 logger.addHandler(file_handler)
 
 
+def save_report_to_file(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        current_date = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
+        file_name = f'../reports/{current_date}_{wrapper.__name__}.json'
+        result = func(*args, *kwargs)
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(result.to_json(force_ascii=False))
+        return result
+    return wrapper
+
+
+@save_report_to_file
 def spending_by_category(transactions: pd.DataFrame,
                          category: str,
                          date: Optional[str] = None) -> pd.DataFrame:
@@ -41,4 +55,10 @@ def spending_by_category(transactions: pd.DataFrame,
         ]
     result = filtered_transactions.groupby(category)['Сумма операции'].sum()
     logger.info('Работа функции spending_by_category завершена успешно')
+    print(result.to_json(force_ascii=False))
     return result
+
+df_trans = pd.read_excel(PATH_TEST_XLSX)
+
+res = spending_by_category(df_trans, 'Категория', '31.12.2021 15:23:42')
+print(res)
