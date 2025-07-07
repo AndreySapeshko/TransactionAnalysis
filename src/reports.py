@@ -2,10 +2,12 @@ from functools import wraps
 from typing import Optional
 from dateutil.relativedelta import relativedelta
 from config import PATH_REPORTS_LOG, PATH_TEST_XLSX
+from typing import TypeVar, Callable, Any
 
 import pandas as pd
 import datetime
 import logging
+import json
 
 
 logger = logging.getLogger(__name__)
@@ -16,14 +18,25 @@ file_handler.setFormatter(file_formater)
 logger.addHandler(file_handler)
 
 
-def save_report_to_file(func):
+def save_report_to_file(func: Callable) -> Callable:
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        logger.info('Запущен декоратор save_report_to_file')
         current_date = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
         file_name = f'../reports/{current_date}_{wrapper.__name__}.json'
         result = func(*args, *kwargs)
         with open(file_name, 'w', encoding='utf-8') as file:
-            file.write(result.to_json(force_ascii=False))
+            try:
+                if isinstance(result, pd.DataFrame) or isinstance(result, pd.Series):
+                    file.write(result.to_json(force_ascii=False))
+                else:
+                    file.write(json.dumps(result, ensure_ascii=False))
+            except Exception as e:
+                message = f'Сбой при попытки конвертации данных в json: {e}'
+                print(message)
+                logger.error(message)
+                file.write(json.dumps(message, ensure_ascii=False))
+        logger.info('Работа декоратора успещно завершена')
         return result
     return wrapper
 
@@ -31,7 +44,7 @@ def save_report_to_file(func):
 @save_report_to_file
 def spending_by_category(transactions: pd.DataFrame,
                          category: str,
-                         date: Optional[str] = None) -> pd.DataFrame:
+                         date: Optional[str] = None) -> pd.Series:
     """ возвращает DataFrame суммы расходов по категориям за три месяца до
     выбранной даты, если дата не выбрана до текоущей даты """
 
@@ -55,5 +68,4 @@ def spending_by_category(transactions: pd.DataFrame,
         ]
     result = filtered_transactions.groupby(category)['Сумма операции'].sum()
     logger.info('Работа функции spending_by_category завершена успешно')
-    print(result.to_json(force_ascii=False))
     return result
