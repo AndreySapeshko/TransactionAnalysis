@@ -20,6 +20,9 @@ logger.addHandler(file_handler)
 
 
 def save_report_to_file(func: Callable) -> Callable:
+    """ Декоратор сохраняет резултать обернутой функции в файл с именем
+    дата+имя функции в деректорию reports в корне проекта """
+
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         logger.info('Запущен декоратор save_report_to_file')
@@ -46,7 +49,7 @@ def save_report_to_file(func: Callable) -> Callable:
 def spending_by_category(transactions: pd.DataFrame,
                          category: str,
                          date: Optional[str] = None) -> pd.Series:
-    """ возвращает DataFrame суммы расходов по категориям за три месяца до
+    """ возвращает pd Series суммы расходов по категориям за три месяца до
     выбранной даты, если дата не выбрана до текоущей даты """
 
     logger.info('Запущена функция spending_by_category')

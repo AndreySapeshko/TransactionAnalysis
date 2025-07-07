@@ -27,9 +27,6 @@ def analysis_categories_for_cashback(data: list[dict], year: str, month: str) ->
         logger.error(f'Ошибка при обработке даты: {e}')
         print(f'Ошибка при обработке даты: {e}')
         filtered_data = []
-    """ из списка операций за выбранный месяц в выбранном году подсчитываем размер кешбека
-    по каждой категории. Результат возвращает словарь в json формате. """
-
     logger.info('Запущена функция analysis_categories_for_cashback')
     try:
         start_date = datetime.datetime(int(year), int(month), 1)
