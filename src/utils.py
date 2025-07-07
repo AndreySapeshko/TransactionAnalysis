@@ -80,7 +80,7 @@ def get_stock_prices(tickers: list) -> list:
     logger.info('Запущена функция get_stock_prices')
     stocks = []
     try:
-        data = yf.download(tickers, period="1d")
+        data = yf.download(tickers, period="1d", auto_adjust=False)
         data_list = json.loads(data['Close'].to_json(orient="records"))
         logger.info('Данные по запросу получены')
     except Exception as e:
