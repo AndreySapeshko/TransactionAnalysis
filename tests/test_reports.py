@@ -5,7 +5,7 @@ import pandas as pd
 
 from config import PATH_TEST_XLSX
 from src.reports import spending_by_category, save_report_to_file
-from unittest.mock import patch
+from pathlib import Path
 
 
 @pytest.mark.parametrize('transactions, category, date, expected', [
@@ -22,13 +22,13 @@ def test_spending_by_category(transactions: str, category: str, date: str, expec
     assert result.to_dict() == expected
 
 
-def test_save_report_to_file():
+def test_save_report_to_file() -> None:
     @save_report_to_file
-    def func_for_test():
+    def func_for_test() -> pd.DataFrame:
         return pd.DataFrame({'test': ['test']})
 
     current_date = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
-    file_name = f'../reports/{current_date}_{func_for_test.__name__}.json'
+    file_name = Path(__file__).parent.parent / 'reports' /f'{current_date}_{func_for_test.__name__}.json'
     result = func_for_test()
     if os.path.exists(file_name):
         with open(file_name) as f:

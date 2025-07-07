@@ -1,8 +1,9 @@
 from functools import wraps
 from typing import Optional
 from dateutil.relativedelta import relativedelta
-from config import PATH_REPORTS_LOG, PATH_TEST_XLSX
-from typing import TypeVar, Callable, Any
+from config import PATH_REPORTS_LOG
+from typing import Callable, Any
+from pathlib import Path
 
 import pandas as pd
 import datetime
@@ -23,7 +24,7 @@ def save_report_to_file(func: Callable) -> Callable:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         logger.info('Запущен декоратор save_report_to_file')
         current_date = datetime.datetime.now().strftime('%d_%m_%Y_%H_%M_%S')
-        file_name = f'../reports/{current_date}_{wrapper.__name__}.json'
+        file_name = Path(__file__).parent.parent / 'reports' / f'{current_date}_{wrapper.__name__}.json'
         result = func(*args, *kwargs)
         with open(file_name, 'w', encoding='utf-8') as file:
             try:
@@ -65,7 +66,7 @@ def spending_by_category(transactions: pd.DataFrame,
     logger.info('Отобраны транзакции за временной интервал')
     filtered_transactions = transactions.loc[
         (transactions['Дата операции'] >= start_date) & (transactions['Дата операции'] < end_date)
-        ]
+    ]
     result = filtered_transactions.groupby(category)['Сумма операции'].sum()
     logger.info('Работа функции spending_by_category завершена успешно')
     return result
